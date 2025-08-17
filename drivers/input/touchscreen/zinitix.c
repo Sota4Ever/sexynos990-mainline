@@ -10,6 +10,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/of.h>
+#include <linux/of_device.h>
 #include <linux/property.h>
 #include <linux/regulator/consumer.h>
 #include <linux/slab.h>
@@ -68,14 +69,12 @@
 #define ZINITIX_X_RESOLUTION			0x00C0
 #define ZINITIX_Y_RESOLUTION			0x00C1
 
-#define ZINITIX_POINT_STATUS_REG		0x0080
-
 #define ZINITIX_BT4X2_ICON_STATUS_REG		0x009A
 #define ZINITIX_BT4X3_ICON_STATUS_REG		0x00A0
 #define ZINITIX_BT4X4_ICON_STATUS_REG		0x00A0
 #define ZINITIX_BT5XX_ICON_STATUS_REG		0x00AA
 
-#define ZINITIX_POINT_COORD_REG			(ZINITIX_POINT_STATUS_REG + 2)
+#define ZINITIX_POINT_COORD_REG(chip) 		((chip)->point_status_reg + 2)
 
 #define ZINITIX_AFE_FREQUENCY			0x0100
 #define ZINITIX_DND_N_COUNT			0x0122
@@ -135,6 +134,82 @@
 #define CHIP_ON_DELAY				15 // ms
 #define FIRMWARE_ON_DELAY			40 // ms
 
+struct zinitix_chip_data {
+	u16 vcmd_enable;
+	u16 vcmd_intn_clr;
+	u16 vcmd_nvm_init;
+	u16 vcmd_nvm_prog_start;
+	u16 point_status_reg;
+};
+
+static const struct zinitix_chip_data zinitix_zt7650_data = {
+	.vcmd_enable        	= 0x10F0,
+	.vcmd_intn_clr		= 0x14F0,
+	.vcmd_nvm_init		= 0x12F0,
+	.vcmd_nvm_prog_start	= 0x11F0,
+	.point_status_reg	= 0x0200,
+};
+
+static const struct zinitix_chip_data zinitix_btxxx_data = {
+	.vcmd_enable		= 0xC000,
+	.vcmd_intn_clr		= 0xC004,
+	.vcmd_nvm_init		= 0xC002,
+	.vcmd_nvm_prog_start	= 0xC001,
+	.point_status_reg   	= 0x0080,
+};
+
+#ifdef CONFIG_OF
+static const struct of_device_id zinitix_of_match[] = {
+	{
+		.compatible = "zinitix,bt402",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt403",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt404",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt412",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt413",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt431",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt432",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt531",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt532",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt538",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt541",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt548",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,bt554",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,at100",
+		.data = &zinitix_btxxx_data
+	}, {
+		.compatible = "zinitix,zt7650",
+		.data = &zinitix_zt7650_data
+	}, { }
+};
+MODULE_DEVICE_TABLE(of, zinitix_of_match);
+#endif
+
 struct point_coord {
 	__le16	x;
 	__le16	y;
@@ -165,6 +240,7 @@ struct bt541_ts_data {
 	u16 firmware_version;
 	u16 regdata_version;
 	u16 icon_status_reg;
+	const struct zinitix_chip_data *chip_data;
 };
 
 static int zinitix_read_data(struct i2c_client *client,
@@ -364,8 +440,9 @@ static int zinitix_send_power_on_sequence(struct bt541_ts_data *bt541)
 {
 	int error;
 	struct i2c_client *client = bt541->client;
+	const struct zinitix_chip_data *chip = bt541->chip_data;
 
-	error = zinitix_write_u16(client, 0xc000, 0x0001);
+	error = zinitix_write_u16(client, chip->vcmd_enable, 0x0001);
 	if (error) {
 		dev_err(&client->dev,
 			"Failed to send power sequence(vendor cmd enable)\n");
@@ -373,7 +450,7 @@ static int zinitix_send_power_on_sequence(struct bt541_ts_data *bt541)
 	}
 	udelay(10);
 
-	error = zinitix_write_cmd(client, 0xc004);
+	error = zinitix_write_cmd(client, chip->vcmd_intn_clr);
 	if (error) {
 		dev_err(&client->dev,
 			"Failed to send power sequence (intn clear)\n");
@@ -381,7 +458,7 @@ static int zinitix_send_power_on_sequence(struct bt541_ts_data *bt541)
 	}
 	udelay(10);
 
-	error = zinitix_write_u16(client, 0xc002, 0x0001);
+	error = zinitix_write_u16(client, chip->vcmd_nvm_init, 0x0001);
 	if (error) {
 		dev_err(&client->dev,
 			"Failed to send power sequence (nvm init)\n");
@@ -389,7 +466,7 @@ static int zinitix_send_power_on_sequence(struct bt541_ts_data *bt541)
 	}
 	mdelay(2);
 
-	error = zinitix_write_u16(client, 0xc001, 0x0001);
+	error = zinitix_write_u16(client, chip->vcmd_nvm_prog_start, 0x0001);
 	if (error) {
 		dev_err(&client->dev,
 			"Failed to send power sequence (program start)\n");
@@ -449,10 +526,11 @@ static irqreturn_t zinitix_ts_irq_handler(int irq, void *bt541_handler)
 	__le16 icon_events;
 	int error;
 	int i;
+	const struct zinitix_chip_data *chip = bt541->chip_data;
 
 	memset(&touch_event, 0, sizeof(struct touch_event));
 
-	error = zinitix_read_data(bt541->client, ZINITIX_POINT_STATUS_REG,
+	error = zinitix_read_data(bt541->client, chip->point_status_reg,
 				  &touch_event, sizeof(struct touch_event));
 	if (error) {
 		dev_err(&client->dev, "Failed to read in touchpoint struct\n");
@@ -614,6 +692,7 @@ static int zinitix_init_input_dev(struct bt541_ts_data *bt541)
 static int zinitix_ts_probe(struct i2c_client *client)
 {
 	struct bt541_ts_data *bt541;
+	const struct of_device_id *match;
 	int error;
 
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
@@ -695,6 +774,12 @@ static int zinitix_ts_probe(struct i2c_client *client)
 		return -EINVAL;
 	}
 
+	match = of_match_device(zinitix_of_match, &client->dev);
+	if (match && match->data)
+		bt541->chip_data = match->data;
+	else
+		return -EINVAL;
+
 	return 0;
 }
 
@@ -730,27 +815,6 @@ static int zinitix_resume(struct device *dev)
 }
 
 static DEFINE_SIMPLE_DEV_PM_OPS(zinitix_pm_ops, zinitix_suspend, zinitix_resume);
-
-#ifdef CONFIG_OF
-static const struct of_device_id zinitix_of_match[] = {
-	{ .compatible = "zinitix,bt402" },
-	{ .compatible = "zinitix,bt403" },
-	{ .compatible = "zinitix,bt404" },
-	{ .compatible = "zinitix,bt412" },
-	{ .compatible = "zinitix,bt413" },
-	{ .compatible = "zinitix,bt431" },
-	{ .compatible = "zinitix,bt432" },
-	{ .compatible = "zinitix,bt531" },
-	{ .compatible = "zinitix,bt532" },
-	{ .compatible = "zinitix,bt538" },
-	{ .compatible = "zinitix,bt541" },
-	{ .compatible = "zinitix,bt548" },
-	{ .compatible = "zinitix,bt554" },
-	{ .compatible = "zinitix,at100" },
-	{ }
-};
-MODULE_DEVICE_TABLE(of, zinitix_of_match);
-#endif
 
 static struct i2c_driver zinitix_ts_driver = {
 	.probe = zinitix_ts_probe,
