@@ -50,6 +50,18 @@
 		regulator-name = "dummy_reg";
 	};
 
+	tsp_ldo_en: regulator-1 {
+		compatible = "regulator-fixed";
+		regulator-name = "tsp_ldo_en";
+		regulator-min-microvolt = <3000000>;
+		regulator-max-microvolt = <3000000>;
+		gpio = <&gpm21 0 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		startup-delay-us = <100000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
@@ -118,6 +130,30 @@
 		samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
 		samsung,pin-drv = <EXYNOS5420_PIN_DRV_LV1>;
 	};
+
+	attn_irq: attn-irq-pins {
+		samsung,pins = "gpa1-0";
+		samsung,pin-function = <EXYNOS_PIN_FUNC_EINT>;
+		samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
+		samsung,pin-drv = <EXYNOS5420_PIN_DRV_LV1>;
+	};
+
+	attn_input: attn-input-pins {
+		samsung,pins = "gpa1-0";
+		samsung,pin-function = <EXYNOS_PIN_FUNC_INPUT>;
+		samsung,pin-pud = <EXYNOS_PIN_PULL_DOWN>;
+	};
+};
+
+&pinctrl_peric1 {
+	tspi2c_bus: tspi2c-bus-pins {
+		samsung,pins = "gpp5-6", "gpp5-7";
+		samsung,pin-function = <EXYNOS_PIN_FUNC_3>;
+		samsung,pin-pud = <EXYNOS_PIN_PULL_NONE>;
+		samsung,pin-drv = <EXYNOS5420_PIN_DRV_LV1>;
+		samsung,pin-con-pdn = <EXYNOS_PIN_PDN_PREV>;
+		samsung,pin-pud-pdn = <EXYNOS_PIN_PULL_NONE>;
+	};
 };
 
 &usbdrd {
@@ -128,4 +164,29 @@
 
 &usbdrd_phy {
 	status = "okay";
+};
+
+&usi_i2c_7 {
+        status = "okay";
+};
+
+&hsi2c_15 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&tspi2c_bus>;
+	status = "okay";
+
+	touchscreen@20 {
+		compatible = "zinitix,zt7650";
+		reg = <0x20>;
+		interrupt-parent = <&gpa1>;
+		interrupts = <0 IRQ_TYPE_NONE>;
+		vdd-supply = <&tsp_ldo_en>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&attn_irq>;
+		touchscreen-size-x = <1080>;
+		touchscreen-size-y = <2400>;
+		zinitix,mode = <0>;
+	};
 };
