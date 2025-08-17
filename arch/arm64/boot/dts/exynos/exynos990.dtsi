@@ -299,6 +299,22 @@
 				pinctrl-names = "default";
 				status = "disabled";
 			};
+
+			spi_0: spi@10550000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x10550000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_PCLK_5>,
+					 <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_IPCLK_5>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 399 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi0_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
+				status = "disabled";
+			};
+
 		};
 
 		usi_i2c_0: usi@105600c0 {
@@ -354,6 +370,21 @@
 				interrupts = <GIC_SPI 401 IRQ_TYPE_LEVEL_HIGH>;
 				pinctrl-0 = <&hsi2c2_bus>;
 				pinctrl-names = "default";
+				status = "disabled";
+			};
+
+			spi_1: spi@10570000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x10570000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_PCLK_7>,
+					 <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_IPCLK_7>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 401 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi1_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
 				status = "disabled";
 			};
 		};
@@ -413,6 +444,21 @@
 				pinctrl-names = "default";
 				status = "disabled";
 			};
+
+			spi_2: spi@10590000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x10590000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_PCLK_9>,
+					 <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_IPCLK_9>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 403 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi2_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
+				status = "disabled";
+			};
 		};
 
 		usi_i2c_2: usi@105a00c0 {
@@ -468,6 +514,21 @@
 				interrupts = <GIC_SPI 405 IRQ_TYPE_LEVEL_HIGH>;
 				pinctrl-0 = <&hsi2c6_bus>;
 				pinctrl-names = "default";
+				status = "disabled";
+			};
+
+			spi_3: spi@105b0000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x105b0000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_PCLK_11>,
+					 <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_IPCLK_11>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 405 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi3_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
 				status = "disabled";
 			};
 		};
@@ -527,6 +588,21 @@
 				pinctrl-names = "default";
 				status = "disabled";
 			};
+
+			spi_4: spi@105d0000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x105d0000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_PCLK_13>,
+					 <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_IPCLK_13>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 407 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi4_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
+				status = "disabled";
+			};
 		};
 
 		usi_i2c_4: usi@105e00c0 {
@@ -582,6 +658,21 @@
 				interrupts = <GIC_SPI 409 IRQ_TYPE_LEVEL_HIGH>;
 				pinctrl-0 = <&hsi2c10_bus>;
 				pinctrl-names = "default";
+				status = "disabled";
+			};
+
+			spi_5: spi@105f0000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x105f0000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_PCLK_15>,
+					 <&cmu_peric0 CLK_GOUT_PERIC0_TOP0_IPCLK_15>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 409 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi5_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
 				status = "disabled";
 			};
 		};
@@ -641,6 +732,21 @@
 				pinctrl-names = "default";
 				status = "disabled";
 			};
+
+			spi_13: spi@10630000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x10630000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric0 CLK_GOUT_PERIC0_TOP1_PCLK_3>,
+					 <&cmu_peric0 CLK_GOUT_PERIC0_TOP1_IPCLK_3>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 411 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi13_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
+				status = "disabled";
+			};
 		};
 
 		usi_i2c_13: usi@106400c0 {
@@ -698,6 +804,21 @@
 				pinctrl-names = "default";
 				status = "disabled";
 			};
+
+			spi_14: spi@10650000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x10650000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric0 CLK_GOUT_PERIC0_TOP1_PCLK_5>,
+					 <&cmu_peric0 CLK_GOUT_PERIC0_TOP1_IPCLK_5>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 413 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi14_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
+				status = "disabled";
+			};
 		};
 
 		usi_i2c_14: usi@106600c0 {
@@ -753,6 +874,21 @@
 				interrupts = <GIC_SPI 415 IRQ_TYPE_LEVEL_HIGH>;
 				pinctrl-0 = <&hsi2c30_bus>;
 				pinctrl-names = "default";
+				status = "disabled";
+			};
+
+			spi_15: spi@10650000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x10670000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric0 CLK_GOUT_PERIC0_TOP1_PCLK_7>,
+					 <&cmu_peric0 CLK_GOUT_PERIC0_TOP1_IPCLK_7>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 415 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi15_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
 				status = "disabled";
 			};
 		};
@@ -835,6 +971,21 @@
 				pinctrl-names = "default";
 				status = "disabled";
 			};
+
+			spi_6: spi@108a0000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x108a0000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric1 CLK_GOUT_PERIC1_TOP0_PCLK_10>,
+					 <&cmu_peric1 CLK_GOUT_PERIC1_TOP0_IPCLK_10>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 419 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi6_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
+				status = "disabled";
+			};
 		};
 
 		usi_i2c_6: usi@108b00c0 {
@@ -890,6 +1041,21 @@
 				interrupts = <GIC_SPI 421 IRQ_TYPE_LEVEL_HIGH>;
 				pinctrl-0 = <&hsi2c14_bus>;
 				pinctrl-names = "default";
+				status = "disabled";
+			};
+
+			spi_7: spi@108c0000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x108c0000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric1 CLK_GOUT_PERIC1_TOP0_PCLK_12>,
+					 <&cmu_peric1 CLK_GOUT_PERIC1_TOP0_IPCLK_12>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 421 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi7_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
 				status = "disabled";
 			};
 		};
@@ -949,6 +1115,21 @@
 				pinctrl-names = "default";
 				status = "disabled";
 			};
+
+			spi_8: spi@108e0000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x108e0000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric1 CLK_GOUT_PERIC1_TOP0_PCLK_14>,
+					 <&cmu_peric1 CLK_GOUT_PERIC1_TOP0_IPCLK_14>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 423 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi8_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <256>;
+				status = "disabled";
+			};
 		};
 
 		usi_i2c_8: usi@108f00c0 {
@@ -1004,6 +1185,21 @@
 				interrupts = <GIC_SPI 425 IRQ_TYPE_LEVEL_HIGH>;
 				pinctrl-0 = <&hsi2c18_bus>;
 				pinctrl-names = "default";
+				status = "disabled";
+			};
+
+			spi_9: spi@10900000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x10900000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_PCLK_0>,
+					 <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_IPCLK_0>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 425 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi9_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <256>;
 				status = "disabled";
 			};
 		};
@@ -1063,6 +1259,21 @@
 				pinctrl-names = "default";
 				status = "disabled";
 			};
+
+			spi_10: spi@10920000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x10920000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_PCLK_2>,
+					 <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_IPCLK_2>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 427 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi10_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <256>;
+				status = "disabled";
+			};
 		};
 
 		usi_i2c_10: usi@109300c0 {
@@ -1118,6 +1329,21 @@
 				interrupts = <GIC_SPI 429 IRQ_TYPE_LEVEL_HIGH>;
 				pinctrl-0 = <&hsi2c22_bus>;
 				pinctrl-names = "default";
+				status = "disabled";
+			};
+
+			spi_11: spi@10940000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x10940000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_PCLK_4>,
+					 <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_IPCLK_4>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 429 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi11_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
 				status = "disabled";
 			};
 		};
@@ -1177,6 +1403,21 @@
 				pinctrl-names = "default";
 				status = "disabled";
 			};
+
+			spi_12: spi@109c0000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x109c0000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_PCLK_12>,
+					 <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_IPCLK_12>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 431 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi12_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
+				status = "disabled";
+			};
 		};
 
 		usi_i2c_12: usi@109d00c0 {
@@ -1232,6 +1473,21 @@
 				interrupts = <GIC_SPI 434 IRQ_TYPE_LEVEL_HIGH>;
 				pinctrl-0 = <&hsi2c32_bus>;
 				pinctrl-names = "default";
+				status = "disabled";
+			};
+
+			spi_16: spi@10960000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x10960000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_PCLK_6>,
+					 <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_IPCLK_6>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 434 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi16_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
 				status = "disabled";
 			};
 		};
@@ -1291,6 +1547,21 @@
 				pinctrl-names = "default";
 				status = "disabled";
 			};
+
+			spi_17: spi@10990000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x10990000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_PCLK_9>,
+					 <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_IPCLK_9>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 437 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi17_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
+				status = "disabled";
+			};
 		};
 
 		usi_i2c_17: usi@109a00c0 {
@@ -1346,6 +1617,21 @@
 				interrupts = <GIC_SPI 439 IRQ_TYPE_LEVEL_HIGH>;
 				pinctrl-0 = <&hsi2c36_bus>;
 				pinctrl-names = "default";
+				status = "disabled";
+			};
+
+			spi_18: spi@109e0000 {
+				compatible = "samsung,exynos990-spi";
+				reg = <0x109e0000 0x30>;
+				#address-cells = <1>;
+				#size-cells = <0>;
+				clocks = <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_PCLK_14>,
+					 <&cmu_peric1 CLK_GOUT_PERIC1_TOP1_IPCLK_14>;
+				clock-names = "spi", "spi_busclk0";
+				interrupts = <GIC_SPI 439 IRQ_TYPE_LEVEL_HIGH>;
+				pinctrl-0 = <&spi18_bus>;
+				pinctrl-names = "default";
+				fifo-depth = <64>;
 				status = "disabled";
 			};
 		};
