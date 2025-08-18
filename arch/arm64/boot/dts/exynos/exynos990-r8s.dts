@@ -18,7 +18,14 @@
 	#address-cells = <2>;
 	#size-cells = <2>;
 
+	aliases {
+		serial0 = &serial_0;
+		serial1 = &serial_1;
+	};
+
 	chosen {
+		stdout-path = "serial0:115200n8";
+
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
@@ -189,4 +196,22 @@
 		touchscreen-size-y = <2400>;
 		zinitix,mode = <0>;
 	};
+};
+
+&usi_uart {
+	samsung,clkreq-on; /* needed for UART mode */
+	status = "okay";
+};
+
+&serial_0 {
+	status = "okay";
+};
+
+&usi_bt_uart {
+        samsung,clkreq-on; /* needed for UART mode */
+        status = "okay";
+};
+
+&serial_1 {
+        status = "okay";
 };
