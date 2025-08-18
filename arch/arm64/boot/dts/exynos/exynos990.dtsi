@@ -2063,6 +2063,21 @@
 			reg = <0x15580000 0x1000>;
 		};
 
+		cmu_apm: clock-controller@15800000 {
+			compatible = "samsung,exynos990-cmu-apm";
+			reg = <0x15800000 0x8000>;
+			#clock-cells = <1>;
+
+			clocks = <&oscclk>, <&cmu_top CLK_DOUT_CMU_APM_BUS>;
+			clock-names = "oscclk", "bus";
+		};
+
+		sysreg_apm: sysreg@15820000 {
+			compatible = "samsung,exynos990-apm-sysreg", "syscon";
+			reg = <0x15820000 0x10000>;
+			clocks = <&cmu_apm CLK_GOUT_APM_SYSREG_PCLK>;
+		};
+
 		pinctrl_alive: pinctrl@15850000 {
 			compatible = "samsung,exynos990-pinctrl";
 			reg = <0x15850000 0x1000>;
