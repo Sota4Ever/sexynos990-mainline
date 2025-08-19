@@ -69,6 +69,14 @@
 		regulator-boot-on;
 	};
 
+	ufs_0_fixed_vcc: regulator-2 {
+		compatible = "regulator-fixed";
+		regulator-name = "ufs-vcc";
+		gpio = <&gpg1 0 GPIO_ACTIVE_HIGH>;
+		regulator-boot-on;
+		enable-active-high;
+	};
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
@@ -214,4 +222,13 @@
 
 &serial_1 {
         status = "okay";
+};
+
+&ufs_0 {
+	vcc-supply = <&ufs_0_fixed_vcc>;
+	status = "okay";
+};
+
+&ufs_0_phy {
+	status = "okay";
 };
