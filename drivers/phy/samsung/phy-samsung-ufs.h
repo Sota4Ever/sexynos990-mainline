@@ -58,6 +58,7 @@ enum {
 	PWR_DESC_G1	= 1,
 	PWR_DESC_G2	= 2,
 	PWR_DESC_G3	= 3,
+	PWR_DESC_G4	= 4,
 	/* field mask */
 	MD_MASK		= 0x3,
 	SR_MASK		= 0x3,
@@ -73,6 +74,9 @@ enum {
 #define PWR_MODE_HS_G3_ANY	PWR_MODE_HS(PWR_DESC_G3, PWR_DESC_ANY)
 #define PWR_MODE_HS_G3_SER_A	PWR_MODE_HS(PWR_DESC_G3, PWR_DESC_SER_A)
 #define PWR_MODE_HS_G3_SER_B	PWR_MODE_HS(PWR_DESC_G3, PWR_DESC_SER_B)
+#define PWR_MODE_HS_G4_ANY	PWR_MODE_HS(PWR_DESC_G4, PWR_DESC_ANY)
+#define PWR_MODE_HS_G4_SER_A	PWR_MODE_HS(PWR_DESC_G4, PWR_DESC_SER_A)
+#define PWR_MODE_HS_G4_SER_B	PWR_MODE_HS(PWR_DESC_G4, PWR_DESC_SER_B)
 #define PWR_MODE(g, s, m)	((((g) & GR_MASK) << 4) |\
 				 (((s) & SR_MASK) << 2) | ((m) & MD_MASK))
 #define PWR_MODE_PWM_ANY	PWR_MODE(PWR_DESC_ANY,\
@@ -148,6 +152,7 @@ void samsung_ufs_phy_config(struct samsung_ufs_phy *phy,
 			    const struct samsung_ufs_phy_cfg *cfg, u8 lane);
 
 extern const struct samsung_ufs_phy_drvdata exynos7_ufs_phy;
+extern const struct samsung_ufs_phy_drvdata exynos990_ufs_phy;
 extern const struct samsung_ufs_phy_drvdata exynosautov9_ufs_phy;
 extern const struct samsung_ufs_phy_drvdata exynosautov920_ufs_phy;
 extern const struct samsung_ufs_phy_drvdata fsd_ufs_phy;
