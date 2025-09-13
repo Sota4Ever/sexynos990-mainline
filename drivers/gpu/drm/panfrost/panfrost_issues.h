@@ -13,6 +13,8 @@
  * to care about.
  */
 enum panfrost_hw_issue {
+	/* The current version of the model doesn't support Soft-Top */
+	HW_ISSUE_5736,
 	/* Need way to guarantee that all previously-translated memory accesses
 	 * are committed */
 	HW_ISSUE_6367,
@@ -124,6 +126,13 @@ enum panfrost_hw_issue {
 	/* "Protected mode" is buggy on Mali-G31 some Bifrost chips, so the
 	 * kernel must fiddle with L2 caches to prevent data leakage */
 	HW_ISSUE_TGOX_R1_1234,
+
+	/* If cache line evict messages can be lost when shader cores
+	 * power down then we need to flush the L2 cache before powering
+	 * down cores. When the flush completes, the shaders' state
+	 * machine needs to be re-invoked to proceed with powering down
+	 * cores. */
+	HW_ISSUE_TTRX_921,
 
 	/* Must set SC_VAR_ALGORITHM */
 	HW_ISSUE_TTRX_2968_TTRX_3162,
@@ -264,6 +273,26 @@ enum panfrost_hw_issue {
 
 #define hw_issues_g57_r0p0 (\
 	BIT_ULL(HW_ISSUE_TTRX_3485))
+
+#define hw_issues_g77 (\
+	BIT_ULL(HW_ISSUE_5736))
+
+#define hw_issues_g77_r0p0 (\
+	BIT_ULL(HW_ISSUE_TTRX_2968_TTRX_3162) | \
+	BIT_ULL(HW_ISSUE_TTRX_921) | \
+	BIT_ULL(HW_ISSUE_TTRX_3485))
+
+#define hw_issues_g77_r0p1 (\
+	BIT_ULL(HW_ISSUE_TTRX_2968_TTRX_3162) | \
+	BIT_ULL(HW_ISSUE_TTRX_921))
+
+#define hw_issues_g77_r1p0 (\
+	BIT_ULL(HW_ISSUE_TTRX_2968_TTRX_3162) | \
+	BIT_ULL(HW_ISSUE_TTRX_921))
+
+#define hw_issues_g77_r1p1 (\
+	BIT_ULL(HW_ISSUE_TTRX_2968_TTRX_3162) | \
+	BIT_ULL(HW_ISSUE_TTRX_921))
 
 static inline bool panfrost_has_hw_issue(const struct panfrost_device *pfdev,
 					 enum panfrost_hw_issue issue)
