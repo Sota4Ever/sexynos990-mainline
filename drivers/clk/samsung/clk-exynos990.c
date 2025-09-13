@@ -1022,6 +1022,11 @@ static const struct samsung_fixed_factor_clock cmu_top_ffactor[] __initconst = {
 };
 
 static const struct samsung_gate_clock top_gate_clks[] __initconst = {
+	GATE(CLK_GOUT_CMU_G3D_BUS, "gout_cmu_g3d_bus", "mout_pll_g3d",
+	     CLK_CON_GAT_CLKCMU_G3D_BUS, 21, 0, 0),
+	GATE(CLK_GOUT_CMU_MIF_SWITCH, "gout_cmu_mif_switch",
+	     "mout_cmu_mif_switch", CLK_CON_GAT_CLKCMU_MIF_SWITCH,
+	     21, 0, 0),
 	GATE(CLK_GOUT_CMU_APM_BUS, "gout_cmu_apm_bus", "mout_cmu_apm_bus",
 	     CLK_CON_GAT_GATE_CLKCMU_APM_BUS, 21, CLK_IGNORE_UNUSED, 0),
 	GATE(CLK_GOUT_CMU_AUD_CPU, "gout_cmu_aud_cpu", "mout_cmu_aud_cpu",
