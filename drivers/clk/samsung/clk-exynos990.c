@@ -19,6 +19,7 @@
 /* NOTE: Must be equal to the last clock ID increased by one */
 #define CLKS_NR_TOP (CLK_DOUT_CMU_CLK_CMUREF + 1)
 #define CLKS_NR_APM (CLK_RCO_I3C_CP +1)
+#define CLKS_NR_G3D (CLK_GOUT_G3D_BUSD_DD_CLK +1)
 #define CLKS_NR_HSI0 (CLK_GOUT_HSI0_LHS_ACEL_D_HSI0_CLK + 1)
 #define CLKS_NR_HSI1 (CLK_GOUT_HSI1_XIU_P_ACLK + 1)
 #define CLKS_NR_PERIC0 (CLK_GOUT_PERIC0_SYSREG_PCLK + 1)
@@ -1793,6 +1794,182 @@ static const struct samsung_cmu_info apm_cmu_info __initconst = {
 	.clk_regs	= apm_clk_regs,
 	.nr_clk_regs	= ARRAY_SIZE(apm_clk_regs),
 	.clk_name	= "bus",
+};
+
+/* ---- CMU_G3D ------------------------------------------------------------ */
+
+/* Register Offset definitions for CMU_G3D (0x18400000) */
+#define PLL_CON0_MUX_CLKCMU_EMBEDDED_G3D_USER					0x0600
+#define PLL_CON1_MUX_CLKCMU_EMBEDDED_G3D_USER					0x0604
+#define PLL_CON0_MUX_CLKCMU_G3D_BUS_USER					0x0610
+#define PLL_CON1_MUX_CLKCMU_G3D_BUS_USER					0x0614
+#define PLL_CON0_MUX_CLKCMU_G3D_SWITCH_USER					0x0620
+#define PLL_CON1_MUX_CLKCMU_G3D_SWITCH_USER					0x0624
+#define CLK_CON_MUX_MUX_CLK_G3D_BUSD						0x1000
+#define CLK_CON_DIV_CLK_G3D_ADD_CH_CLK						0x1800
+#define CLK_CON_DIV_DIV_CLK_G3D_BUSD						0x1804
+#define CLK_CON_DIV_DIV_CLK_G3D_BUSP						0x1808
+#define CLK_CON_GAT_CLK_BLK_G3D_UID_ADD_G3D_IPCLKPORT_CH_CLK			0x2000
+#define CLK_CON_GAT_CLK_BLK_G3D_UID_ADD_G3D_IPCLKPORT_CLK			0x2004
+#define CLK_CON_GAT_CLK_BLK_G3D_UID_ASB_G3D_IPCLKPORT_DDD_G3D_CK_IN		0x2008
+#define CLK_CON_GAT_CLK_BLK_G3D_UID_G3D_CMU_G3D_IPCLKPORT_PCLK			0x200c
+#define CLK_CON_GAT_CLK_BLK_G3D_UID_GPU_IPCLKPORT_CLK				0x2010
+#define CLK_CON_GAT_CLK_BLK_G3D_UID_HPM_G3D_IPCLKPORT_HPM_TARGETCLK_C		0x2014
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_ADD_APBIF_G3D_IPCLKPORT_CLK_CORE		0x2018
+#define CLK_CON_GAT_CLK_BLK_G3D_UID_RSTNSYNC_CLK_G3D_OSCCLK_IPCLKPORT_CLK	0x201c
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_ADD_APBIF_G3D_IPCLKPORT_PCLK		0x2024
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_BUSIF_HPMG3D_IPCLKPORT_PCLK		0x2028
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_D_TZPC_G3D_IPCLKPORT_PCLK			0x202c
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_GRAY2BIN_G3D_IPCLKPORT_CLK			0x2030
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_LHM_AXI_P_G3D_IPCLKPORT_I_CLK		0x2034
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_LHM_AXI_P_INT_G3D_IPCLKPORT_I_CLK		0x2038
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_LHS_AXI_P_INT_G3D_IPCLKPORT_I_CLK		0x203c
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_DDD_APBIF_G3D_IPCLKPORT_CK_IN		0x2040
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_RSTNSYNC_CLK_G3D_BUSD_IPCLKPORT_CLK	0x2044
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_RSTNSYNC_CLK_G3D_BUSP_IPCLKPORT_CLK	0x2048
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_SYSREG_G3D_IPCLKPORT_PCLK			0x204c
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_VGEN_LITE_G3D_IPCLKPORT_CLK		0x2050
+#define CLK_CON_GAT_GOUT_BLK_G3D_UID_RSTNSYNC_CLK_G3D_BUSD_DD_IPCLKPORT_CLK	0x2054
+
+static const unsigned long g3d_clk_regs[] __initconst = {
+	PLL_CON0_MUX_CLKCMU_EMBEDDED_G3D_USER,
+	PLL_CON1_MUX_CLKCMU_EMBEDDED_G3D_USER,
+	PLL_CON0_MUX_CLKCMU_G3D_BUS_USER,
+	PLL_CON1_MUX_CLKCMU_G3D_BUS_USER,
+	PLL_CON0_MUX_CLKCMU_G3D_SWITCH_USER,
+	PLL_CON1_MUX_CLKCMU_G3D_SWITCH_USER,
+	CLK_CON_MUX_MUX_CLK_G3D_BUSD,
+	CLK_CON_DIV_CLK_G3D_ADD_CH_CLK,
+	CLK_CON_DIV_DIV_CLK_G3D_BUSD,
+	CLK_CON_DIV_DIV_CLK_G3D_BUSP,
+	CLK_CON_GAT_CLK_BLK_G3D_UID_ADD_G3D_IPCLKPORT_CH_CLK,
+	CLK_CON_GAT_CLK_BLK_G3D_UID_ADD_G3D_IPCLKPORT_CLK,
+	CLK_CON_GAT_CLK_BLK_G3D_UID_ASB_G3D_IPCLKPORT_DDD_G3D_CK_IN,
+	CLK_CON_GAT_CLK_BLK_G3D_UID_G3D_CMU_G3D_IPCLKPORT_PCLK,
+	CLK_CON_GAT_CLK_BLK_G3D_UID_GPU_IPCLKPORT_CLK,
+	CLK_CON_GAT_CLK_BLK_G3D_UID_HPM_G3D_IPCLKPORT_HPM_TARGETCLK_C,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_ADD_APBIF_G3D_IPCLKPORT_CLK_CORE,
+	CLK_CON_GAT_CLK_BLK_G3D_UID_RSTNSYNC_CLK_G3D_OSCCLK_IPCLKPORT_CLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_ADD_APBIF_G3D_IPCLKPORT_PCLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_BUSIF_HPMG3D_IPCLKPORT_PCLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_D_TZPC_G3D_IPCLKPORT_PCLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_GRAY2BIN_G3D_IPCLKPORT_CLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_LHM_AXI_P_G3D_IPCLKPORT_I_CLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_LHM_AXI_P_INT_G3D_IPCLKPORT_I_CLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_LHS_AXI_P_INT_G3D_IPCLKPORT_I_CLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_DDD_APBIF_G3D_IPCLKPORT_CK_IN,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_RSTNSYNC_CLK_G3D_BUSD_IPCLKPORT_CLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_RSTNSYNC_CLK_G3D_BUSP_IPCLKPORT_CLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_SYSREG_G3D_IPCLKPORT_PCLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_VGEN_LITE_G3D_IPCLKPORT_CLK,
+	CLK_CON_GAT_GOUT_BLK_G3D_UID_RSTNSYNC_CLK_G3D_BUSD_DD_IPCLKPORT_CLK,
+};
+
+PNAME(mout_embedded_g3d_user_p) = { "oscclk", "dout_g3d_busd" };
+PNAME(mout_g3d_bus_user_p)	= { "oscclk", "gout_cmu_g3d_bus" };
+PNAME(mout_g3d_switch_user_p)	= { "oscclk", "dout_cmu_g3d_switch" };
+PNAME(mout_g3d_busd_p)		= { "mout_g3d_bus_user", "mout_g3d_switch_user" };
+
+static const struct samsung_mux_clock g3d_mux_clks[] __initconst = {
+	MUX(CLK_MOUT_EMBEDDED_G3D_USER, "mout_embedded_g3d_user", mout_embedded_g3d_user_p,
+	    PLL_CON0_MUX_CLKCMU_EMBEDDED_G3D_USER, 4, 1),
+	MUX(CLK_MOUT_G3D_BUS_USER, "mout_g3d_bus_user", mout_g3d_bus_user_p,
+	    PLL_CON0_MUX_CLKCMU_G3D_BUS_USER, 4, 1),
+	MUX(CLK_MOUT_G3D_SWITCH_USER, "mout_g3d_switch_user", mout_g3d_switch_user_p,
+	    PLL_CON0_MUX_CLKCMU_G3D_SWITCH_USER, 4, 1),
+	MUX(CLK_MOUT_G3D_BUSD, "mout_g3d_busd", mout_g3d_busd_p,
+	    CLK_CON_MUX_MUX_CLK_G3D_BUSD, 0, 1),
+};
+
+static const struct samsung_fixed_factor_clock g3d_ffactor_clks[] __initconst = {
+	FFACTOR(CLK_DOUT_G3D_ADD_CH_CLK, "dout_g3d_add_ch_clk", "oscclk", 1, 12, 0),
+};
+
+static const struct samsung_div_clock g3d_div_clks[] __initconst = {
+	DIV(CLK_DOUT_G3D_BUSD, "dout_g3d_busd", "mout_g3d_busd",
+	    CLK_CON_DIV_DIV_CLK_G3D_BUSD, 0, 3),
+	DIV(CLK_DOUT_G3D_BUSP, "dout_g3d_busp", "mout_g3d_busd",
+	    CLK_CON_DIV_DIV_CLK_G3D_BUSP, 0, 3),
+};
+
+static const struct samsung_gate_clock g3d_gate_clks[] __initconst = {
+	GATE(CLK_GOUT_G3D_ADD_CH_CLK, "gout_g3d_add_ch_clk", "dout_g3d_add_ch_clk",
+	     CLK_CON_GAT_CLK_BLK_G3D_UID_ADD_G3D_IPCLKPORT_CH_CLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_ADD_CLK, "gout_g3d_add_clk", "mout_g3d_busd",
+	     CLK_CON_GAT_CLK_BLK_G3D_UID_ADD_G3D_IPCLKPORT_CLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_ASB_DDD_CK_IN, "gout_g3d_ddd_ck_in", "mout_g3d_busd",
+	     CLK_CON_GAT_CLK_BLK_G3D_UID_ASB_G3D_IPCLKPORT_DDD_G3D_CK_IN,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_CMU_PCLK, "gout_g3d_cmu_pclk", "dout_g3d_busp",
+	     CLK_CON_GAT_CLK_BLK_G3D_UID_G3D_CMU_G3D_IPCLKPORT_PCLK,
+	     21, CLK_IS_CRITICAL, 0),
+	GATE(CLK_GOUT_G3D_GPU_CLK, "gout_g3d_gpu_clk", "mout_embedded_g3d_user",
+	     CLK_CON_GAT_CLK_BLK_G3D_UID_GPU_IPCLKPORT_CLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_HPM_TARGETCLK_C, "gout_g3d_hpm_targetclk_c", "dout_cmu_hpm",
+	     CLK_CON_GAT_CLK_BLK_G3D_UID_HPM_G3D_IPCLKPORT_HPM_TARGETCLK_C,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_ADD_APBIF_CLK_CORE, "gout_g3d_add_apbif_clk_core", "mout_g3d_busd",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_ADD_APBIF_G3D_IPCLKPORT_CLK_CORE,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_OSCCLK_CLK, "gout_g3d_oscclk_clk", "oscclk",
+	     CLK_CON_GAT_CLK_BLK_G3D_UID_RSTNSYNC_CLK_G3D_OSCCLK_IPCLKPORT_CLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_ADD_APBIF_PCLK, "gout_g3d_add_apbif_pclk", "dout_g3d_busp",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_ADD_APBIF_G3D_IPCLKPORT_PCLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_BUSIF_HPMG3D_PCLK, "gout_g3d_busif_hpmg3d_pclk", "dout_g3d_busp",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_BUSIF_HPMG3D_IPCLKPORT_PCLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_D_TZPC_PCLK, "gout_g3d_d_tzpc_pclk", "dout_g3d_busp",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_D_TZPC_G3D_IPCLKPORT_PCLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_GRAY2BIN_CLK, "gout_g3d_gray2bin_clk", "mout_embedded_g3d_user",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_GRAY2BIN_G3D_IPCLKPORT_CLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_LHM_AXI_P_CLK, "gout_g3d_lhm_axi_p_clk", "dout_g3d_busp",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_LHM_AXI_P_G3D_IPCLKPORT_I_CLK,
+	     21, CLK_IS_CRITICAL, 0),
+	GATE(CLK_GOUT_G3D_LHM_AXI_P_INT_CLK, "gout_g3d_lhm_axi_p_int_clk", "mout_embedded_g3d_user",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_LHM_AXI_P_INT_G3D_IPCLKPORT_I_CLK,
+	     21, CLK_IS_CRITICAL, 0),
+	GATE(CLK_GOUT_G3D_LHS_AXI_P_CLK, "gout_g3d_lhs_axi_p_clk", "dout_g3d_busp",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_LHS_AXI_P_INT_G3D_IPCLKPORT_I_CLK,
+	     21, CLK_IS_CRITICAL, 0),
+	GATE(CLK_GOUT_G3D_DDD_APBIF_CK_IN, "gout_g3d_ddd_apbif_ck_in", "mout_g3d_busd",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_DDD_APBIF_G3D_IPCLKPORT_CK_IN,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_BUSD_CLK, "gout_g3d_busd_clk", "mout_embedded_g3d_user",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_RSTNSYNC_CLK_G3D_BUSD_IPCLKPORT_CLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_BUSP_CLK, "gout_g3d_busp_clk", "dout_g3d_busp",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_RSTNSYNC_CLK_G3D_BUSP_IPCLKPORT_CLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_SYSREG_PCLK, "gout_g3d_sysreg_pclk", "dout_g3d_busp",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_SYSREG_G3D_IPCLKPORT_PCLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_VGEN_LITE_CLK, "gout_g3d_vgen_lite_clk", "dout_g3d_busp",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_VGEN_LITE_G3D_IPCLKPORT_CLK,
+	     21, 0, 0),
+	GATE(CLK_GOUT_G3D_BUSD_DD_CLK, "gout_g3d_busd_dd_clk", "mout_g3d_busd",
+	     CLK_CON_GAT_GOUT_BLK_G3D_UID_RSTNSYNC_CLK_G3D_BUSD_DD_IPCLKPORT_CLK,
+	     21, 0, 0),
+};
+
+static const struct samsung_cmu_info g3d_cmu_info __initconst = {
+	.mux_clks = g3d_mux_clks,
+	.nr_mux_clks = ARRAY_SIZE(g3d_mux_clks),
+	.div_clks = g3d_div_clks,
+	.nr_div_clks = ARRAY_SIZE(g3d_div_clks),
+	.fixed_factor_clks = g3d_ffactor_clks,
+	.nr_fixed_factor_clks = ARRAY_SIZE(g3d_ffactor_clks),
+	.gate_clks = g3d_gate_clks,
+	.nr_gate_clks = ARRAY_SIZE(g3d_gate_clks),
+	.nr_clk_ids = CLKS_NR_G3D,
+	.clk_regs = g3d_clk_regs,
+	.nr_clk_regs = ARRAY_SIZE(g3d_clk_regs),
 };
 
 /* ---- CMU_HSI0 ------------------------------------------------------------ */
@@ -3851,6 +4028,9 @@ static const struct of_device_id exynos990_cmu_of_match[] = {
 	{
 		.compatible = "samsung,exynos990-cmu-apm",
 		.data = &apm_cmu_info,
+	}, {
+		.compatible = "samsung,exynos990-cmu-g3d",
+		.data = &g3d_cmu_info,
 	}, {
 		.compatible = "samsung,exynos990-cmu-hsi0",
 		.data = &hsi0_cmu_info,
