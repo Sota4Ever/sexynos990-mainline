@@ -2141,6 +2141,198 @@
 			};
 		};
 
+		pd_aud: power-domain@15861900 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15861900 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380000>;
+			label = "AUD";
+		};
+
+		pd_csis: power-domain@15861d80 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15861d80 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380001>;
+			label = "CSIS";
+		};
+
+		pd_dns: power-domain@15861e00 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15861e00 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xB1380002>;
+			power-domains = <&pd_itp>;
+			label = "DNS";
+		};
+
+		pd_dpu: power-domain@15861e80 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15861e80 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380003>;
+			label = "DPU";
+		};
+
+		pd_dsp0: power-domain@15861f00 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15861f00 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380004>;
+			power-domains = <&pd_dnc>;
+			label = "DSP0";
+		};
+
+		pd_dsp1: power-domain@15861f80 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15861f80 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380005>;
+			power-domains = <&pd_dsp0>;
+			label = "DSP1";
+		};
+
+		pd_dsp2: power-domain@15862e00 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862e00 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380006>;
+			power-domains  = <&pd_dsp1>;
+			label = "DSP2";
+		};
+
+		pd_dnc: power-domain@15862000 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862000 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380007>;
+			label = "DNC";
+		};
+
+		pd_embedded_g3d: power-domain@15862200 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862200 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380008>;
+			label = "EMBEDDED-G3D";
+		};
+
+		pd_g2d: power-domain@15862280 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862280 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380009>;
+			label = "G2D";
+		};
+
+		pd_hsi0: power-domain@15862380 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862380 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb138000a>;
+			label = "HSI0";
+		};
+
+		pd_ipp: power-domain@15862500 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862500 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb138000b>;
+			label = "IPP";
+		};
+
+		pd_itp: power-domain@15862580 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862580 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb138000c>;
+			label = "ITP";
+		};
+
+		pd_mfc0: power-domain@15862600 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862600 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb138000d>;
+			label = "MFC0";
+		};
+
+		pd_mcsc: power-domain@15862880 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862880 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb138000e>;
+			label = "MSCS";
+		};
+
+		pd_npu00: power-domain@15862900 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862900 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb138000f>;
+			power-domains = <&pd_dnc>;
+			label = "NPU00";
+		};
+
+		pd_npu01: power-domain@15862980 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862980 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380010>;
+			power-domains = <&pd_npu00>;
+			label = "NPU01";
+		};
+
+		pd_npu10: power-domain@15862e80 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862e80 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380011>;
+			power-domains = <&pd_npu01>;
+			label = "NPU10";
+		};
+
+		pd_npu11: power-domain@15862f00 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862f00 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380012>;
+			power-domains = <&pd_npu10>;
+			label = "NPU11";
+		};
+
+		pd_tnr: power-domain@15862c00 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862c00 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380013>;
+			label = "TNR";
+		};
+
+		pd_vra: power-domain@15862c80 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862c80 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380014>;
+			label = "VRA";
+		};
+
+		pd_vts: power-domaims@15862d00 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862d00 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380015>;
+			label = "VTS";
+		};
+
+		pd_ssp: power-domain@15862d80 {
+			compatible = "samsung,exynos990-pd";
+			reg = <0x15862d80 0x20>;
+			#power-domain-cells = <0>;
+			cal_id = <0xb1380016>;
+			label = "SSP";
+		};
+
 		ap2apm_mailbox: mailbox@15900000 {
 			compatible = "google,gs101-mbox";
 			reg = <0x15900000 0x1000>;
