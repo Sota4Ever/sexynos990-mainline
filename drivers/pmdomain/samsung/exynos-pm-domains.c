@@ -31,7 +31,19 @@ struct exynos_pm_domain {
 	void __iomem *base;
 	struct generic_pm_domain pd;
 	u32 local_pwr_cfg;
+	u32 cal_id;
+	bool use_cal;
 };
+
+static int cal_pd_control(unsigned int id, int on)
+{
+	return 0;
+}
+
+static int cal_pd_status(unsigned int id)
+{
+	return 1;
+}
 
 static int exynos_pd_power(struct generic_pm_domain *domain, bool power_on)
 {
@@ -39,19 +51,29 @@ static int exynos_pd_power(struct generic_pm_domain *domain, bool power_on)
 	void __iomem *base;
 	u32 timeout, pwr;
 	char *op;
+	int ret;
 
 	pd = container_of(domain, struct exynos_pm_domain, pd);
-	base = pd->base;
 
+	if (pd->use_cal) {
+		ret = cal_pd_control(pd->cal_id, power_on ? 1 : 0);
+		if (ret) {
+			op = power_on ? "enable" : "disable";
+			pr_err("Power domain %s %s failed\n", domain->name, op);
+			return ret;
+		}
+		return 0;
+	}
+
+	base = pd->base;
 	pwr = power_on ? pd->local_pwr_cfg : 0;
 	writel_relaxed(pwr, base);
 
-	/* Wait max 1ms */
 	timeout = 10;
 
 	while ((readl_relaxed(base + 0x4) & pd->local_pwr_cfg) != pwr) {
 		if (!timeout) {
-			op = (power_on) ? "enable" : "disable";
+			op = power_on ? "enable" : "disable";
 			pr_err("Power domain %s %s failed\n", domain->name, op);
 			return -ETIMEDOUT;
 		}
@@ -88,6 +110,9 @@ static const struct of_device_id exynos_pm_domain_of_match[] = {
 	}, {
 		.compatible = "samsung,exynos5433-pd",
 		.data = &exynos5433_cfg,
+	}, {
+		.compatible = "samsung,exynos990-pd",
+		.data = NULL,
 	},
 	{ },
 };
@@ -125,11 +150,33 @@ static int exynos_pd_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
+	if (of_property_read_u32(np, "cal_id", &pd->cal_id) == 0) {
+		pd->use_cal = true;
+	} else {
+		pd->use_cal = false;
+		if (!pm_domain_cfg) {
+			dev_err(dev, "No cal_id and no match data available\n");
+			kfree_const(pd->pd.name);
+			iounmap(pd->base);
+			return -EINVAL;
+		}
+		pd->local_pwr_cfg = pm_domain_cfg->local_pwr_cfg;
+	}
+
 	pd->pd.power_off = exynos_pd_power_off;
 	pd->pd.power_on = exynos_pd_power_on;
-	pd->local_pwr_cfg = pm_domain_cfg->local_pwr_cfg;
 
-	on = readl_relaxed(pd->base + 0x4) & pd->local_pwr_cfg;
+	if (pd->use_cal) {
+		on = cal_pd_status(pd->cal_id);
+		if (on < 0) {
+			dev_err(dev, "Failed to get status for domain %s\n", pd->pd.name);
+			kfree_const(pd->pd.name);
+			iounmap(pd->base);
+			return on;
+		}
+	} else {
+		on = readl_relaxed(pd->base + 0x4) & pd->local_pwr_cfg;
+	}
 
 	pm_genpd_init(&pd->pd, NULL, !on);
 	ret = of_genpd_add_provider_simple(np, &pd->pd);
@@ -147,12 +194,6 @@ static int exynos_pd_probe(struct platform_device *pdev)
 				parent.np, child.np);
 	}
 
-	/*
-	 * Some Samsung platforms with bootloaders turning on the splash-screen
-	 * and handing it over to the kernel, requires the power-domains to be
-	 * reset during boot. As a temporary hack to manage this, let's enforce
-	 * a sync_state.
-	 */
 	if (!ret)
 		of_genpd_sync_state(np);
 
