@@ -314,10 +314,15 @@
 
 		usbdrd_phy: phy@10c00000 {
 			compatible = "samsung,exynos990-usbdrd-phy";
-			reg = <0x10c00000 0x100>;
+			reg = <0x10c00000 0x0200>,
+			      <0x10af0000 0x0800>,
+			      <0x10ae0000 0x2800>;
+			reg-names = "phy", "pcs", "pma";
 			clocks = <&cmu_hsi0 CLK_GOUT_HSI0_USB31DRD_ACLK_PHYCTRL>,
-				 <&oscclk>;
-			clock-names = "phy", "ref";
+				 <&oscclk>,
+				 <&cmu_hsi0 CLK_GOUT_HSI0_USB31DRD_USBDPPHY_REF_SOC_PLL>,
+				 <&cmu_hsi0 CLK_GOUT_HSI0_USB31DRD_USBDPPHY_SCL_APB>;
+			clock-names = "phy", "ref", "ref_pll", "scl_pclk";
 			samsung,pmu-syscon = <&pmu_system_controller>;
 			#phy-cells = <1>;
 			status = "disabled";
@@ -338,8 +343,8 @@
 				compatible = "snps,dwc3";
 				reg = <0x0 0x10000>;
 				interrupts = <GIC_SPI 310 IRQ_TYPE_LEVEL_HIGH>;
-				phys = <&usbdrd_phy 0>;
-				phy-names = "usb2-phy";
+				phys = <&usbdrd_phy 0>, <&usbdrd_phy 1>;
+				phy-names = "usb2-phy", "usb3-phy";
 			};
 		};
 
