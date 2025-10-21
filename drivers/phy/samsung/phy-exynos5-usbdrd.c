@@ -273,6 +273,9 @@
 #define CMN_REG00B8_LANE_MUX_SEL_DP_LANE1	BIT(1)
 #define CMN_REG00B8_LANE_MUX_SEL_DP_LANE0	BIT(0)
 
+#define EXYNOS9_PMA_USBDP_CMN_REG00B9		0x02e4
+#define CMN_REG00B9_DP_LANE_EN			GENMASK(3, 0)
+
 #define EXYNOS9_PMA_USBDP_CMN_REG01C0		0x0700
 #define CMN_REG01C0_ANA_LCPLL_LOCK_DONE		BIT(7)
 #define CMN_REG01C0_ANA_LCPLL_AFC_DONE		BIT(6)
@@ -1636,6 +1639,42 @@ static const struct phy_ops exynos850_usbdrd_phy_ops = {
 	.owner		= THIS_MODULE,
 };
 
+static void exynos5_usbdrd_exynos990_pipe3_init(struct exynos5_usbdrd_phy *phy_drd)
+{
+	void __iomem *regs_pma = phy_drd->reg_pma;
+	void __iomem *regs_base = phy_drd->reg_pma;
+	void __iomem *regs_phy = phy_drd->reg_phy;
+	u32 reg;
+
+	exynos5_usbdrd_usbdp_g2_v4_ctrl_pma_ready(phy_drd);
+
+	/* force aux off */
+	reg = readl(regs_pma + EXYNOS9_PMA_USBDP_CMN_REG0008);
+	reg &= ~CMN_REG0008_AUX_EN;
+	reg |= CMN_REG0008_OVRD_AUX_EN;
+	writel(reg, regs_pma + EXYNOS9_PMA_USBDP_CMN_REG0008);
+
+	exynos5_usbdrd_apply_phy_tunes(phy_drd, PTS_PIPE3_PREINIT);
+	exynos5_usbdrd_apply_phy_tunes(phy_drd, PTS_PIPE3_INIT);
+	exynos5_usbdrd_apply_phy_tunes(phy_drd, PTS_PIPE3_POSTINIT);
+
+	exynos5_usbdrd_usbdp_g2_v4_pma_lane_mux_sel(phy_drd);
+
+	/* dp_lane_en = 0  */
+	reg = readl(regs_base + EXYNOS9_PMA_USBDP_CMN_REG00B9);
+	reg &= ~CMN_REG00B9_DP_LANE_EN;
+	writel(reg, regs_base + EXYNOS9_PMA_USBDP_CMN_REG00B9);
+
+	/* reset release from port */
+	reg = readl(regs_phy + EXYNOS850_DRD_SECPMACTL);
+	reg &= ~(SECPMACTL_PMA_TRSV_SW_RST | SECPMACTL_PMA_CMN_SW_RST |
+		 SECPMACTL_PMA_INIT_SW_RST);
+	writel(reg, regs_phy + EXYNOS850_DRD_SECPMACTL);
+
+	if (!exynos5_usbdrd_usbdp_g2_v4_pma_check_pll_lock(phy_drd))
+		exynos5_usbdrd_usbdp_g2_v4_pma_check_cdr_lock(phy_drd);
+}
+
 static void exynos5_usbdrd_gs101_pipe3_init(struct exynos5_usbdrd_phy *phy_drd)
 {
 	void __iomem *regs_pma = phy_drd->reg_pma;
@@ -1929,6 +1968,10 @@ static const char * const exynos5_core_clk_names[] = {
 	"ref",
 };
 
+static const char * const exynos990_core_clk_names [] = {
+	"ref", "ref_pll",
+};
+
 static const char * const exynos5433_core_clk_names[] = {
 	"ref", "phy_pipe", "phy_utmi", "itp",
 };
@@ -2025,6 +2068,19 @@ static const struct exynos5_usbdrd_phy_drvdata exynos850_usbdrd_phy = {
 	.n_regulators		= ARRAY_SIZE(exynos5_regulator_names),
 };
 
+static const struct exynos5_usbdrd_phy_config phy_cfg_exynos990[] = {
+	{
+		.id		= EXYNOS5_DRDPHY_UTMI,
+		.phy_isol	= exynos5_usbdrd_phy_isol,
+		.phy_init	= exynos850_usbdrd_utmi_init,
+	},
+	{
+		.id		= EXYNOS5_DRDPHY_PIPE3,
+		.phy_isol	= exynos5_usbdrd_phy_isol,
+		.phy_init	= exynos5_usbdrd_exynos990_pipe3_init,
+	},
+};
+
 static const struct exynos5_usbdrd_phy_tuning exynos990_tunes_utmi_postinit[] = {
 	PHY_TUNING_ENTRY_PHY(EXYNOS850_DRD_HSPPARACON,
 			     (HSPPARACON_TXVREF |
@@ -2037,21 +2093,231 @@ static const struct exynos5_usbdrd_phy_tuning exynos990_tunes_utmi_postinit[] = 
 	PHY_TUNING_ENTRY_LAST
 };
 
+static const struct exynos5_usbdrd_phy_tuning exynos990_tunes_pipe3_preinit[] = {
+	/* TX Impedance Settings */
+	PHY_TUNING_ENTRY_PMA(0x0bbc, 0xff, 0x77),
+	PHY_TUNING_ENTRY_PMA(0x10b4, 0xff, 0x77),
+	PHY_TUNING_ENTRY_PMA(0x1bbc, 0xff, 0x77),
+	PHY_TUNING_ENTRY_PMA(0x20b4, 0xff, 0x77),
+	PHY_TUNING_ENTRY_PMA(0x10b0, 0x0f, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x20b0, 0x0f, 0x05),
+	/* turn off for power saving */
+	PHY_TUNING_ENTRY_PMA(0x0298, 0x10, 0x00),
+	/* set C0-C1 of DPE during Offset calibration pll_lock_done watchdog enable */
+	PHY_TUNING_ENTRY_PMA(0x0594, 0x08, 0x08),
+	PHY_TUNING_ENTRY_PMA(0x0420, 0x3f, 0x3f),
+	/* Common reset for 4lane tx */
+	PHY_TUNING_ENTRY_PMA(0x0858, 0x20, 0x20),
+	PHY_TUNING_ENTRY_PMA(0x1058, 0x20, 0x20),
+	PHY_TUNING_ENTRY_PMA(0x1858, 0x20, 0x20),
+	PHY_TUNING_ENTRY_PMA(0x2058, 0x20, 0x20),
+	/* Clear Reserved Fields */
+	PHY_TUNING_ENTRY_PMA(0x0894, 0xff, 0x00),
+	PHY_TUNING_ENTRY_PMA(0x0a1c, 0xff, 0x00),
+	PHY_TUNING_ENTRY_PMA(0x1094, 0xff, 0x00),
+	PHY_TUNING_ENTRY_PMA(0x1894, 0xff, 0x00),
+	PHY_TUNING_ENTRY_PMA(0x1a1c, 0xff, 0x00),
+	PHY_TUNING_ENTRY_PMA(0x2094, 0xff, 0x00),
+	/* CDR & LCPLL Configurations */
+	PHY_TUNING_ENTRY_PMA(0x0324, 0x07, 0x07),
+	/* Can be fail to calibration by unknown data from RX_DP/DN during rate change */
+	PHY_TUNING_ENTRY_PMA(0x0450, 0x01, 0x00),
+	/* Request to change LCPLL default settings from PLL designer */
+	PHY_TUNING_ENTRY_PMA(0x0070, 0x9c, 0x10),
+	/* AFE setting optimization for JTOL */
+	PHY_TUNING_ENTRY_PMA(0x093c, 0x38, 0x28),
+	PHY_TUNING_ENTRY_PMA(0x0948, 0x38, 0x30),
+	PHY_TUNING_ENTRY_PMA(0x193c, 0x38, 0x28),
+	PHY_TUNING_ENTRY_PMA(0x1948, 0x38, 0x30),
+	/* When changing the rate, unknown data
+	   may enter RX_DP/DN, which may cause cal failure. */
+	PHY_TUNING_ENTRY_PMA(0x0450, 0x01, 0x00),
+	/* Solving the problem of Adapation done not appearing */
+	PHY_TUNING_ENTRY_PMA(0x0c3c, 0x01, 0x01),
+	PHY_TUNING_ENTRY_PMA(0x0ac8, 0x7f, 0x1b),
+	PHY_TUNING_ENTRY_PMA(0x1c3c, 0x01, 0x01),
+	PHY_TUNING_ENTRY_PMA(0x1ac8, 0x7f, 0x1b),
+	/* EDS Test RX Scatter Optimization Settings */
+	PHY_TUNING_ENTRY_PMA(0x090c, 0x07, 0x06),
+	PHY_TUNING_ENTRY_PMA(0x190c, 0x07, 0x06),
+	PHY_TUNING_ENTRY_PMA(0x0e04, 0xff, 0xff),
+	PHY_TUNING_ENTRY_PMA(0x1e04, 0xff, 0xff),
+	/* USB Gen2 23dB loss CTLE setting */
+	PHY_TUNING_ENTRY_PMA(0x0ebc, 0x3f, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x091c, 0x07, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x0928, 0x07, 0x06),
+	PHY_TUNING_ENTRY_PMA(0x0a60, 0x1f, 0x0b),
+	PHY_TUNING_ENTRY_PMA(0x0a78, 0x1f, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x0ad0, 0xff, 0x03),
+	PHY_TUNING_ENTRY_PMA(0x1ebc, 0x3f, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x191c, 0x07, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x1928, 0x07, 0x06),
+	PHY_TUNING_ENTRY_PMA(0x1a60, 0x1f, 0x0b),
+	PHY_TUNING_ENTRY_PMA(0x1a78, 0x1f, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x1ad0, 0xff, 0x03),
+	/* LCPLL AFC Start code = 2 */
+	PHY_TUNING_ENTRY_PMA(0x0064, 0x3f, 0x1a),
+	/* Offset calibration and RXAFE optimization */
+	PHY_TUNING_ENTRY_PMA(0x0aa0, 0x07, 0x07),
+	PHY_TUNING_ENTRY_PMA(0x0aa4, 0x3f, 0x3f),
+	PHY_TUNING_ENTRY_PMA(0x0aa8, 0x3f, 0x3f),
+	PHY_TUNING_ENTRY_PMA(0x0aac, 0x38, 0x38),
+	PHY_TUNING_ENTRY_PMA(0x0dec, 0x3f, 0x2b),
+	PHY_TUNING_ENTRY_PMA(0x0df0, 0x3f, 0x25),
+	PHY_TUNING_ENTRY_PMA(0x1aa0, 0x07, 0x07),
+	PHY_TUNING_ENTRY_PMA(0x1aa4, 0x3f, 0x3f),
+	PHY_TUNING_ENTRY_PMA(0x1aa8, 0x3f, 0x3f),
+	PHY_TUNING_ENTRY_PMA(0x1aac, 0x38, 0x38),
+	PHY_TUNING_ENTRY_PMA(0x1dec, 0x3f, 0x2b),
+	PHY_TUNING_ENTRY_PMA(0x1df0, 0x3f, 0x25),
+	/* CDR data mode exit GEN1 ON / GEN2 OFF */
+	PHY_TUNING_ENTRY_PMA(0x0c8c, 0xff, 0xff),
+	PHY_TUNING_ENTRY_PMA(0x1c8c, 0xff, 0xff),
+	PHY_TUNING_ENTRY_PMA(0x0c9c, 0x78, 0x78),
+	PHY_TUNING_ENTRY_PMA(0x1c9c, 0x78, 0x78),
+	/* EDS Test Dispersion Optimization Configuration */
+	PHY_TUNING_ENTRY_PMA(0x0e7c, 0x06, 0x06),
+	PHY_TUNING_ENTRY_PMA(0x09e0, 0x0c, 0x00),
+	PHY_TUNING_ENTRY_PMA(0x09e4, 0x3f, 0x36),
+	PHY_TUNING_ENTRY_PMA(0x1e7c, 0x06, 0x06),
+	PHY_TUNING_ENTRY_PMA(0x19e0, 0x0c, 0x00),
+	PHY_TUNING_ENTRY_PMA(0x19e4, 0x3f, 0x36),
+	/* Offset calibration code average from +,- direction */
+	PHY_TUNING_ENTRY_PMA(0x0e5c, 0x03, 0x02),
+	PHY_TUNING_ENTRY_PMA(0x1e5c, 0x03, 0x02),
+	/* DFE offset cal range setting */
+	PHY_TUNING_ENTRY_PMA(0x0e80, 0x03, 0x03),
+	PHY_TUNING_ENTRY_PMA(0x1e80, 0x03, 0x03),
+	/* EDS LVCC Improvement */
+	PHY_TUNING_ENTRY_PMA(0x08f0, 0x0c, 0x00),
+	PHY_TUNING_ENTRY_PMA(0x18f0, 0x0c, 0x00),
+	/* LFPS RX BW tuning */
+	PHY_TUNING_ENTRY_PMA(0x0a08, 0x1c, 0x10),
+	PHY_TUNING_ENTRY_PMA(0x1a08, 0x1C, 0x10),
+	PHY_TUNING_ENTRY_PMA(0x0a0c, 0x3f, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x1a0c, 0x3f, 0x05),
+	/* USB EVT1.1, Gen2 RX JTOL Improvement */
+	PHY_TUNING_ENTRY_PMA(0x0948, 0x38, 0x38),
+	PHY_TUNING_ENTRY_PMA(0x1948, 0x38, 0x38),
+	PHY_TUNING_ENTRY_PMA(0x093c, 0x38, 0x38),
+	PHY_TUNING_ENTRY_PMA(0x193c, 0x38, 0x38),
+	PHY_TUNING_ENTRY_PMA(0x091c, 0x33, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x191c, 0x33, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x0928, 0x07, 0x07),
+	PHY_TUNING_ENTRY_PMA(0x1928, 0x07, 0x07),
+	PHY_TUNING_ENTRY_PMA(0x0934, 0xc0, 0x80),
+	PHY_TUNING_ENTRY_PMA(0x1934, 0xc0, 0x80),
+	PHY_TUNING_ENTRY_PMA(0x0dec, 0x1f, 0x09),
+	PHY_TUNING_ENTRY_PMA(0x0df0, 0x1f, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x1dec, 0x1f, 0x09),
+	PHY_TUNING_ENTRY_PMA(0x1df0, 0x1f, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x0954, 0x07, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x1954, 0x07, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x0968, 0x0c, 0x08),
+	PHY_TUNING_ENTRY_PMA(0x1968, 0x0c, 0x08),
+	PHY_TUNING_ENTRY_PMA(0x0ebc, 0x3f, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x1ebc, 0x3f, 0x05),
+	PHY_TUNING_ENTRY_PMA(0x0e0c, 0x38, 0x38),
+	PHY_TUNING_ENTRY_PMA(0x1e0c, 0x38, 0x38),
+	PHY_TUNING_ENTRY_PMA(0x08e8, 0x0e, 0x04),
+	PHY_TUNING_ENTRY_PMA(0x18e8, 0x0e, 0x04),
+	/* TX receiver detector vref sel control, set to 650mV */
+	PHY_TUNING_ENTRY_PMA(0x104c, 0x06, 0x04),
+	PHY_TUNING_ENTRY_PMA(0x204c, 0x06, 0x04),
+	/* reduce Ux Exit time, Recovery.Active(TS1) n x REFCLK_PERIOD(38.4ns) */
+	PHY_TUNING_ENTRY_PMA(0x0ca8, 0xff, 0x00),
+	PHY_TUNING_ENTRY_PMA(0x0cac, 0xff, 0x04),
+	PHY_TUNING_ENTRY_PMA(0x1ca8, 0xff, 0x00),
+	PHY_TUNING_ENTRY_PMA(0x1cac, 0xff, 0x04),
+
+	PHY_TUNING_ENTRY_LAST
+};
+
+static const struct exynos5_usbdrd_phy_tuning exynos990_tunes_pipe3_init[] = {
+        /* Set skp_remive_tbh 0x2 -> 0x5 for avoiding retry problem */
+        PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_EBUF_PARAM,
+                             EBUF_PARAM_SKP_REMOVE_TH_EMPTY_MODE,
+                             FIELD_PREP_CONST(EBUF_PARAM_SKP_REMOVE_TH_EMPTY_MODE, 0x5)),
+        /* Abnormal comman pattern mask */
+        PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_BACK_END_MODE_VEC,
+                             BACK_END_MODE_VEC_DISABLE_DATA_MASK, 0),
+        /* De-serializer enabled when U2 */
+        PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_OUT_VEC_2,
+                             PCS_OUT_VEC_B4_DYNAMIC, PCS_OUT_VEC_B4_SEL_OUT),
+        /* TX Keeper Disable, Squelch off when U3 */
+        PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_OUT_VEC_3,
+                             PCS_OUT_VEC_B7_DYNAMIC, PCS_OUT_VEC_B7_SEL_OUT |
+                             PCS_OUT_VEC_B2_SEL_OUT),
+        /* PCS SFR Setting: Noh M.W */
+        PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_NS_VEC_PS1_N1, -1,
+                            (FIELD_PREP_CONST(NS_VEC_NS_REQ, 5) |
+                             NS_VEC_ENABLE_TIMER |
+                             FIELD_PREP_CONST(NS_VEC_SEL_TIMEOUT, 3))),
+        PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_NS_VEC_PS2_N0, -1,
+                            (FIELD_PREP_CONST(NS_VEC_NS_REQ, 1) |
+                             NS_VEC_ENABLE_TIMER |
+                             FIELD_PREP_CONST(NS_VEC_SEL_TIMEOUT, 3) |
+                             FIELD_PREP_CONST(NS_VEC_COND_MASK, 2) |
+                             FIELD_PREP_CONST(NS_VEC_EXP_COND, 2))),
+        PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_NS_VEC_PS3_N0, -1,
+                            (FIELD_PREP_CONST(NS_VEC_NS_REQ, 1) |
+                             NS_VEC_ENABLE_TIMER |
+                             FIELD_PREP_CONST(NS_VEC_SEL_TIMEOUT, 3) |
+                             FIELD_PREP_CONST(NS_VEC_COND_MASK, 7) |
+                             FIELD_PREP_CONST(NS_VEC_EXP_COND, 7))),
+        PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_TIMEOUT_0, -1, 112),
+	PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_TIMEOUT_3, -1, 16),
+	/* Block Aligner Type B */
+	PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_RX_CONTROL, 0,
+			     RX_CONTROL_EN_BLOCK_ALIGNER_TYPE_B),
+	/* Block align at TS1/TS2 for Gen2 stability (Gen2 Only) */
+	PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_RX_CONTROL_DEBUG, RX_CONTROL_DEBUG_NUM_COM_FOUND,
+			    (RX_CONTROL_DEBUG_EN_TS_CHECK |
+			     FIELD_PREP_CONST(RX_CONTROL_DEBUG_NUM_COM_FOUND, 4))),
+	/* Gen1 TX Driver pre-shoot, de-emphasis, level ctrl */
+	PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_HS_TX_COEF_MAP_0,
+			     (HS_TX_COEF_MAP_0_SSTX_DEEMP | HS_TX_COEF_MAP_0_SSTX_LEVEL |
+			      HS_TX_COEF_MAP_0_SSTX_PRE_SHOOT),
+			     (FIELD_PREP_CONST(HS_TX_COEF_MAP_0_SSTX_DEEMP, 8) |
+			      FIELD_PREP_CONST(HS_TX_COEF_MAP_0_SSTX_LEVEL, 0xb) |
+			      FIELD_PREP_CONST(HS_TX_COEF_MAP_0_SSTX_PRE_SHOOT, 0))),
+	/* Gen2 TX Driver level ctrl */
+	PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_LOCAL_COEF,
+			     LOCAL_COEF_PMA_CENTER_COEF,
+			     FIELD_PREP_CONST(LOCAL_COEF_PMA_CENTER_COEF, 0xb)),
+
+	PHY_TUNING_ENTRY_LAST
+};
+
+static const struct exynos5_usbdrd_phy_tuning exynos990_tunes_pipe3_postlock[] = {
+	PHY_TUNING_ENTRY_PCS(EXYNOS9_PCS_OUT_VEC_3, PCS_OUT_VEC_B2_SEL_OUT, 0),
+
+	PHY_TUNING_ENTRY_LAST
+};
+
 static const struct exynos5_usbdrd_phy_tuning *exynos990_tunes[PTS_MAX] = {
 	[PTS_UTMI_POSTINIT] = exynos990_tunes_utmi_postinit,
+	[PTS_PIPE3_PREINIT] = exynos990_tunes_pipe3_preinit,
+	[PTS_PIPE3_INIT] = exynos990_tunes_pipe3_init,
+	[PTS_PIPE3_POSTLOCK] = exynos990_tunes_pipe3_postlock,
+};
+
+static const char * const exynos990_clk_names[] = {
+        "phy", "scl_pclk",
 };
 
 static const struct exynos5_usbdrd_phy_drvdata exynos990_usbdrd_phy = {
-	.phy_cfg		= phy_cfg_exynos850,
-	.phy_ops		= &exynos850_usbdrd_phy_ops,
-	.phy_tunes		= exynos990_tunes,
-	.pmu_offset_usbdrd0_phy	= EXYNOS990_PHY_CTRL_USB20,
-	.clk_names		= exynos5_clk_names,
-	.n_clks			= ARRAY_SIZE(exynos5_clk_names),
-	.core_clk_names		= exynos5_core_clk_names,
-	.n_core_clks		= ARRAY_SIZE(exynos5_core_clk_names),
-	.regulator_names	= exynos5_regulator_names,
-	.n_regulators		= ARRAY_SIZE(exynos5_regulator_names),
+	.phy_cfg		   = phy_cfg_exynos990,
+	.phy_ops		   = &gs101_usbdrd_phy_ops,
+	.phy_tunes		   = exynos990_tunes,
+	.pmu_offset_usbdrd0_phy	   = EXYNOS990_PHY_CTRL_USB20,
+	.pmu_offset_usbdrd0_phy_ss = EXYNOS990_PHY_CTRL_USBDP,
+	.clk_names		   = exynos990_clk_names,
+	.n_clks			   = ARRAY_SIZE(exynos990_clk_names),
+	.core_clk_names		   = exynos990_core_clk_names,
+	.n_core_clks		   = ARRAY_SIZE(exynos990_core_clk_names),
+	.regulator_names	   = exynos5_regulator_names,
+	.n_regulators		   = ARRAY_SIZE(exynos5_regulator_names),
 };
 
 static const struct exynos5_usbdrd_phy_config phy_cfg_gs101[] = {
