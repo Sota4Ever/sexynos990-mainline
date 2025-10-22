@@ -312,6 +312,12 @@
 				      "dpgtc";
 		};
 
+		sysreg_hsi0: syscon@10a20000 {
+			compatible = "samsung,exynos990-hsi0-sysreg", "syscon";
+			reg = <0x10a20000 0x10000>;
+			clocks = <&cmu_hsi0 CLK_GOUT_HSI0_SYSREG_HSI0_PCLK>;
+		};
+
 		usbdrd_phy: phy@10c00000 {
 			compatible = "samsung,exynos990-usbdrd-phy";
 			reg = <0x10c00000 0x0200>,
