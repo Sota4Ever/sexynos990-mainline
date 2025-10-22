@@ -200,6 +200,12 @@
 			clock-names = "oscclk", "bus";
 		};
 
+		sysreg_peris: syscon@10030000 {
+			compatible = "samsung,exynos990-peris-sysreg", "syscon";
+			reg = <0x10030000 0x10000>;
+			clocks = <&cmu_peris CLK_GOUT_PERIS_SYSREG_PERIS_PCLK>;
+		};	
+
 		timer@10040000 {
 			compatible = "samsung,exynos990-mct",
 				     "samsung,exynos4210-mct";
