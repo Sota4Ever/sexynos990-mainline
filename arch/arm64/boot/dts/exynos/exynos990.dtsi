@@ -2213,6 +2213,12 @@
 			clock-names = "oscclk", "bus", "switch";
 		};
 
+		sysreg_g3d: sysreg@18420000 {
+			compatible = "samsung,exynos990-g3d-sysreg", "syscon";
+			reg = <0x18420000 10000>;
+			clocks = <&cmu_g3d CLK_GOUT_G3D_SYSREG_PCLK>;
+		};
+
 		gpu: gpu@18500000 {
 			compatible = "samsung,exynos990-mali", "arm,mali-valhall-jm";
 			reg = <0x18500000 0x5000>;
