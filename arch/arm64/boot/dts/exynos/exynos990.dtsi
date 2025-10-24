@@ -75,6 +75,13 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x0>;
 			enable-method = "psci";
+			i-cache-size = <32768>;
+			i-cache-line-size = <64>;
+			i-cache-sets = <128>;
+			d-cache-size = <32768>;
+			d-cache-line-size = <64>;
+			d-cache-sets = <128>;
+			next-level-cache = <&l2_ananke_0>;
 		};
 
 		cpu1: cpu@1 {
@@ -82,6 +89,13 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x1>;
 			enable-method = "psci";
+			i-cache-size = <32768>;
+			i-cache-line-size = <64>;
+			i-cache-sets = <128>;
+			d-cache-size = <32768>;
+			d-cache-line-size = <64>;
+			d-cache-sets = <128>;
+			next-level-cache = <&l2_ananke_1>;
 		};
 
 		cpu2: cpu@2 {
@@ -89,6 +103,13 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x2>;
 			enable-method = "psci";
+			i-cache-size = <32768>;
+			i-cache-line-size = <64>;
+			i-cache-sets = <128>;
+			d-cache-size = <32768>;
+			d-cache-line-size = <64>;
+			d-cache-sets = <128>;
+			next-level-cache = <&l2_ananke_2>;
 		};
 
 		cpu3: cpu@3 {
@@ -96,6 +117,13 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x3>;
 			enable-method = "psci";
+			i-cache-size = <32768>;
+			i-cache-line-size = <64>;
+			i-cache-sets = <128>;
+			d-cache-size = <32768>;
+			d-cache-line-size = <64>;
+			d-cache-sets = <128>;
+			next-level-cache = <&l2_ananke_3>;
 		};
 
 		cpu4: cpu@100 {
@@ -103,6 +131,13 @@
 			compatible = "arm,cortex-a76";
 			reg = <0x4>;
 			enable-method = "psci";
+			i-cache-size = <65536>;
+			i-cache-line-size = <64>;
+			i-cache-sets = <256>;
+			d-cache-size = <65536>;
+			d-cache-line-size = <64>;
+			d-cache-sets = <256>;
+			next-level-cache = <&l2_enyo_0>;
 		};
 
 		cpu5: cpu@101 {
@@ -110,6 +145,13 @@
 			compatible = "arm,cortex-a76";
 			reg = <0x5>;
 			enable-method = "psci";
+			i-cache-size = <65536>;
+			i-cache-line-size = <64>;
+			i-cache-sets = <256>;
+			d-cache-size = <65536>;
+			d-cache-line-size = <64>;
+			d-cache-sets = <256>;
+			next-level-cache = <&l2_enyo_1>;
 		};
 
 		cpu6: cpu@200 {
@@ -117,6 +159,13 @@
 			compatible = "samsung,mongoose-m5";
 			reg = <0x6>;
 			enable-method = "psci";
+			i-cache-size = <65536>;
+			i-cache-line-size = <128>;
+			i-cache-sets = <128>;
+			d-cache-size = <65536>;
+			d-cache-line-size = <64>;
+			d-cache-sets = <256>;
+			next-level-cache = <&l2_lion>;
 		};
 
 		cpu7: cpu@201 {
@@ -124,6 +173,92 @@
 			compatible = "samsung,mongoose-m5";
 			reg = <0x7>;
 			enable-method = "psci";
+			i-cache-size = <65536>;
+			i-cache-line-size = <128>;
+			i-cache-sets = <128>;
+			d-cache-size = <65536>;
+			d-cache-line-size = <64>;
+			d-cache-sets = <256>;
+			next-level-cache = <&l2_lion>;
+		};
+
+		l2_ananke_0: l2-cache@0 {
+			compatible = "cache";
+			cache-level = <2>;
+			cache-size = <65536>;
+			cache-line-size = <64>;
+			cache-sets = <256>;
+			next-level-cache = <&l3_dsu>;
+		};
+
+		l2_ananke_1: l2-cache@1 {
+			compatible = "cache";
+			cache-level = <2>;
+			cache-size = <65536>;
+			cache-line-size = <64>;
+			cache-sets = <256>;
+			next-level-cache = <&l3_dsu>;
+		};
+
+		l2_ananke_2: l2-cache@2 {
+			compatible = "cache";
+			cache-level = <2>;
+			cache-size = <65536>;
+			cache-line-size = <64>;
+			cache-sets = <256>;
+			next-level-cache = <&l3_dsu>;
+		};
+
+		l2_ananke_3: l2-cache@3 {
+			compatible = "cache";
+			cache-level = <2>;
+			cache-size = <65536>;
+			cache-line-size = <64>;
+			cache-sets = <256>;
+			next-level-cache = <&l3_dsu>;
+		};
+
+		l2_enyo_0: l2-cache@4 {
+			compatible = "cache";
+			cache-level = <2>;
+			cache-size = <262144>;
+			cache-line-size = <64>;
+			cache-sets = <512>;
+			next-level-cache = <&l3_dsu>;
+		};
+
+		l2_enyo_1: l2-cache@5 {
+			compatible = "cache";
+			cache-level = <2>;
+			cache-size = <262144>;
+			cache-line-size = <64>;
+			cache-sets = <512>;
+			next-level-cache = <&l3_dsu>;
+		};
+
+		l2_lion: l2-cache@100 {
+			compatible = "cache";
+			cache-level = <2>;
+			cache-size = <2097152>;
+			cache-line-size = <64>;
+			cache-sets = <4096>;
+			next-level-cache = <&l3_lion>;
+		};
+
+		l3_dsu: l3-cache@0 {
+			compatible = "cache";
+			cache-level = <3>;
+			cache-line-size = <64>;
+			cache-sets = <1024>;
+			cache-size = <1048576>;
+		};
+
+		l3_lion: l3-cache@100 {
+			compatible = "cache";
+			cache-level = <3>;
+			cache-line-size = <64>;
+			cache-sets = <4096>;
+			cache-size = <3145728>;
 		};
 	};
 
