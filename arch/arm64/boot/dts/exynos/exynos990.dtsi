@@ -76,6 +76,8 @@
 			reg = <0x0>;
 			enable-method = "psci";
 			cpu-idle-states = <&ananke_cpu_sleep>;
+			capacity-dmips-per-mhz = <2776>;
+			dynamic-power-coefficient = <112>;
 			i-cache-size = <32768>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <128>;
@@ -91,6 +93,8 @@
 			reg = <0x1>;
 			enable-method = "psci";
 			cpu-idle-states = <&ananke_cpu_sleep>;
+			capacity-dmips-per-mhz = <2776>;
+			dynamic-power-coefficient = <112>;
 			i-cache-size = <32768>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <128>;
@@ -106,6 +110,8 @@
 			reg = <0x2>;
 			enable-method = "psci";
 			cpu-idle-states = <&ananke_cpu_sleep>;
+			capacity-dmips-per-mhz = <2776>;
+			dynamic-power-coefficient = <112>;
 			i-cache-size = <32768>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <128>;
@@ -121,6 +127,8 @@
 			reg = <0x3>;
 			enable-method = "psci";
 			cpu-idle-states = <&ananke_cpu_sleep>;
+			capacity-dmips-per-mhz = <2776>;
+			dynamic-power-coefficient = <112>;
 			i-cache-size = <32768>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <128>;
@@ -136,6 +144,8 @@
 			reg = <0x4>;
 			enable-method = "psci";
 			cpu-idle-states = <&enyo_cpu_sleep>;
+			capacity-dmips-per-mhz = <6618>;
+			dynamic-power-coefficient = <331>;
 			i-cache-size = <65536>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <256>;
@@ -151,6 +161,8 @@
 			reg = <0x5>;
 			enable-method = "psci";
 			cpu-idle-states = <&enyo_cpu_sleep>;
+			capacity-dmips-per-mhz = <6618>;
+			dynamic-power-coefficient = <331>;
 			i-cache-size = <65536>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <256>;
@@ -166,6 +178,8 @@
 			reg = <0x6>;
 			enable-method = "psci";
 			cpu-idle-states = <&lion_cpu_sleep>;
+			capacity-dmips-per-mhz = <8248>;
+			dynamic-power-coefficient = <908>;
 			i-cache-size = <65536>;
 			i-cache-line-size = <128>;
 			i-cache-sets = <128>;
@@ -181,6 +195,8 @@
 			reg = <0x7>;
 			enable-method = "psci";
 			cpu-idle-states = <&lion_cpu_sleep>;
+			capacity-dmips-per-mhz = <8248>;
+			dynamic-power-coefficient = <908>;
 			i-cache-size = <65536>;
 			i-cache-line-size = <128>;
 			i-cache-sets = <128>;
