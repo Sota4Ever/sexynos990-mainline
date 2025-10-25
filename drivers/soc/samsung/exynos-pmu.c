@@ -116,6 +116,11 @@ static const struct regmap_config regmap_pmu_intr = {
 	.use_raw_spinlock = true,
 };
 
+static const struct exynos_pmu_data exynos990_pmu_data = {
+	.pmu_secure = false,
+	.pmu_cpuhp = true,
+};
+
 /*
  * PMU platform driver and devicetree bindings.
  */
@@ -149,6 +154,9 @@ static const struct of_device_id exynos_pmu_of_device_ids[] = {
 		.compatible = "samsung,exynos7-pmu",
 	}, {
 		.compatible = "samsung,exynos850-pmu",
+	}, {
+		.compatible = "samsung,exynos990-pmu",
+		.data = &exynos990_pmu_data,
 	},
 	{ /*sentinel*/ },
 };
