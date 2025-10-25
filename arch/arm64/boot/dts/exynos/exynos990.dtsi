@@ -75,6 +75,7 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x0>;
 			enable-method = "psci";
+			cpu-idle-states = <&ananke_cpu_sleep>;
 			i-cache-size = <32768>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <128>;
@@ -89,6 +90,7 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x1>;
 			enable-method = "psci";
+			cpu-idle-states = <&ananke_cpu_sleep>;
 			i-cache-size = <32768>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <128>;
@@ -103,6 +105,7 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x2>;
 			enable-method = "psci";
+			cpu-idle-states = <&ananke_cpu_sleep>;
 			i-cache-size = <32768>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <128>;
@@ -117,6 +120,7 @@
 			compatible = "arm,cortex-a55";
 			reg = <0x3>;
 			enable-method = "psci";
+			cpu-idle-states = <&ananke_cpu_sleep>;
 			i-cache-size = <32768>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <128>;
@@ -131,6 +135,7 @@
 			compatible = "arm,cortex-a76";
 			reg = <0x4>;
 			enable-method = "psci";
+			cpu-idle-states = <&enyo_cpu_sleep>;
 			i-cache-size = <65536>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <256>;
@@ -145,6 +150,7 @@
 			compatible = "arm,cortex-a76";
 			reg = <0x5>;
 			enable-method = "psci";
+			cpu-idle-states = <&enyo_cpu_sleep>;
 			i-cache-size = <65536>;
 			i-cache-line-size = <64>;
 			i-cache-sets = <256>;
@@ -159,6 +165,7 @@
 			compatible = "samsung,mongoose-m5";
 			reg = <0x6>;
 			enable-method = "psci";
+			cpu-idle-states = <&lion_cpu_sleep>;
 			i-cache-size = <65536>;
 			i-cache-line-size = <128>;
 			i-cache-sets = <128>;
@@ -173,6 +180,7 @@
 			compatible = "samsung,mongoose-m5";
 			reg = <0x7>;
 			enable-method = "psci";
+			cpu-idle-states = <&lion_cpu_sleep>;
 			i-cache-size = <65536>;
 			i-cache-line-size = <128>;
 			i-cache-sets = <128>;
@@ -180,6 +188,40 @@
 			d-cache-line-size = <64>;
 			d-cache-sets = <256>;
 			next-level-cache = <&l2_lion>;
+		};
+
+		idle-states {
+			entry-method = "psci";
+
+			ananke_cpu_sleep: cpu-ananke-sleep {
+				idle-state-name = "c2";
+				compatible = "samsung,exynos-idle-state";
+				arm,psci-suspend-param = <0x0010000>;
+				local-timer-stop;
+				entry-latency-us = <70>;
+				exit-latency-us = <160>;
+				min-residency-us = <2000>;
+			};
+
+			enyo_cpu_sleep: cpu-enyo-sleep {
+				idle-state-name = "c2";
+				compatible = "samsung,exynos-idle-state";
+				arm,psci-suspend-param = <0x0010000>;
+				local-timer-stop;
+				entry-latency-us = <150>;
+				exit-latency-us = <190>;
+				min-residency-us = <2500>;
+			};
+
+			lion_cpu_sleep: cpu-lion-sleep {
+				idle-state-name = "c2";
+				compatible = "samsung,exynos-idle-state";
+				arm,psci-suspend-param = <0x0010000>;
+				local-timer-stop;
+				entry-latency-us = <235>;
+				exit-latency-us = <220>;
+				min-residency-us = <3500>;
+			};
 		};
 
 		l2_ananke_0: l2-cache@0 {
