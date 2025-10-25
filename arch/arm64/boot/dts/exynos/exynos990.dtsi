@@ -2098,9 +2098,9 @@
 		};
 
 		pmu_system_controller: system-controller@15860000 {
-			compatible = "samsung,exynos990-pmu",
-				     "samsung,exynos7-pmu", "syscon";
+			compatible = "samsung,exynos990-pmu", "syscon";
 			reg = <0x15860000 0x10000>;
+			google,pmu-intr-gen-syscon = <&pmu_intr_gen>;
 
 			reboot: syscon-reboot {
 				compatible = "syscon-reboot";
@@ -2109,6 +2109,12 @@
 				mask = <0x2>; /* SWRESET_TRIGGER */
 				value = <0x2>;
 			};
+		};
+
+		pmu_intr_gen: syscon@15870000 {
+			compatible = "samsung,exynos990-pmu-intr-gen", "syscon";
+			reg = <0x15870000 0x10000>;
+			clocks = <&cmu_apm CLK_GOUT_APM_PMU_INTR_GEN_PCLK>;
 		};
 
 		ap2apm_mailbox: mailbox@15900000 {
