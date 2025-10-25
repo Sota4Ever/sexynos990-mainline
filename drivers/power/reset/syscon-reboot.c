@@ -122,6 +122,28 @@ static int syscon_reboot_probe(struct platform_device *pdev)
 	return err;
 }
 
+static const struct reboot_data exynos990_reboot_data = {
+	.mode_bits = {
+		[REBOOT_WARM] = {
+			.offset = 0x3a00, /* SYSTEM_CONFIGURATION */
+			.mask = 0x00000002, /* SWRESET_SYSTEM */
+			.value = 0x00000002,
+			.valid = true,
+		},
+		[REBOOT_SOFT] = {
+			.offset = 0x3a00, /* SYSTEM_CONFIGURATION */
+			.mask = 0x00000002, /* SWRESET_SYSTEM */
+			.value = 0x00000002,
+			.valid = true,
+		},
+	},
+	.catchall = {
+		.offset = 0x030c, /* PAD_CTRL_PWR_HOLD */
+		.mask = 0x00000100,
+		.value = 0x00000000,
+	},
+};
+
 static const struct reboot_data gs101_reboot_data = {
 	.mode_bits = {
 		[REBOOT_WARM] = {
@@ -146,6 +168,7 @@ static const struct reboot_data gs101_reboot_data = {
 
 static const struct of_device_id syscon_reboot_of_match[] = {
 	{ .compatible = "google,gs101-reboot", .data = &gs101_reboot_data  },
+	{ .compatible = "samsung,exynos990-reboot", .data = &exynos990_reboot_data  },
 	{ .compatible = "syscon-reboot" },
 	{}
 };
