@@ -101,6 +101,14 @@ config ARM_EXYNOS_CPUIDLE
 	help
 	  Select this to enable cpuidle for Exynos processors.
 
+config ARM_EXYNOS64_CPUIDLE
+	bool "Cpu idle Driver for ARM64 Exynos processors"
+	depends on (ARCH_EXYNOS || COMPILE_TEST) && !ARM
+	select CPU_IDLE_MULTIPLE_DRIVERS
+	select DT_IDLE_STATES
+	help
+	  Select this to enable cpuidle for ARM64 Exynos proccesors.
+
 config ARM_MVEBU_V7_CPUIDLE
 	bool "CPU Idle Driver for mvebu v7 family processors"
 	depends on (ARCH_MVEBU || COMPILE_TEST) && !ARM64
