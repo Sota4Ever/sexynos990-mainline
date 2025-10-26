@@ -171,3 +171,7 @@
 &ufs_0_phy {
 	status = "okay";
 };
+
+&gpu {
+	status = "okay";
+};
